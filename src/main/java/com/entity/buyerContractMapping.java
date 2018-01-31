@@ -8,10 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "sellerContractMapping")
-public class sellerContractMapping {
+@Table(name = "buyerContractMapping")
+public class buyerContractMapping {
 
-	
 	@Id
 	@Column(name = "Id")
 	public String Id;
@@ -24,4 +23,5 @@ public class sellerContractMapping {
 
 	@Column(name = "createdOn")
 	public BigInteger createdOn;
+
 }

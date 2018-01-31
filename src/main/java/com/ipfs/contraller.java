@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blockchain.landOwnershipContractImp;
 import com.blockchain.masterConstractImp;
+import com.entity.buyerContractMapping;
 import com.entity.buyerDetails;
 import com.entity.propertyDetails;
 import com.entity.response;
-import com.entity.sellerContractMapping;
 import com.entity.sign_up;
 import com.serviceInt.donor_details_Int;
 
@@ -32,6 +32,20 @@ public class contraller {
 
 	@Autowired
 	donor_details_Int donor_details_Int;
+
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ResponseEntity<Object> init() {
+		response res = new response();
+		try {
+			if (res.getMessage() != null) {
+				res.result = "server started";
+				return new ResponseEntity<Object>(res, HttpStatus.UNAUTHORIZED);
+			}
+			return new ResponseEntity<Object>(res, HttpStatus.OK);
+		} catch (Exception Ex) {
+			return new ResponseEntity<Object>(res, HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@RequestMapping(value = "/signUp", method = RequestMethod.POST)
 	public ResponseEntity<Object> signUp(@RequestBody sign_up sign_up) {
@@ -159,6 +173,7 @@ public class contraller {
 	public ResponseEntity<Object> setBid(@PathVariable String contractAddress, @RequestBody buyerDetails buyerDetails) {
 		response res = new response();
 		try {
+			System.out.print("contractAddress ####" + contractAddress);
 			smart.contractAddress = contractAddress;
 			System.out.println("######address #### \n" + buyerDetails.address);
 			res = smart.SetBid(buyerDetails);
@@ -227,10 +242,12 @@ public class contraller {
 		}
 	}
 
-	@RequestMapping(value = "/deposit/{ethers}", method = RequestMethod.GET)
-	public ResponseEntity<Object> deposit(@PathVariable("ethers") BigInteger _value) {
+	@RequestMapping(value = "/deposit/{ethers}/{contractAddress}", method = RequestMethod.GET)
+	public ResponseEntity<Object> deposit(@PathVariable("ethers") BigInteger _value,
+			@PathVariable("contractAddress") String contractAddress) {
 		response res = new response();
 		try {
+			smart.contractAddress = contractAddress;
 			res = smart.deposit(_value);
 			if (res.getMessage() != null) {
 				return new ResponseEntity<Object>(res, HttpStatus.BAD_REQUEST);
@@ -305,7 +322,6 @@ public class contraller {
 				res.setMessage("No broker added");
 				return new ResponseEntity<Object>(res, HttpStatus.OK);
 			}
-			// res.setResult(" details added successfully");
 			res.setResult(brokerList);
 			return new ResponseEntity<Object>(res, HttpStatus.OK);
 		} catch (Exception ex) {
@@ -369,11 +385,11 @@ public class contraller {
 		}
 	}
 
-	@RequestMapping(value = "/addSellerToContract", method = RequestMethod.POST)
-	public ResponseEntity<Object> addSellerToContract(@RequestBody sellerContractMapping sellerContractMapping) {
+	@RequestMapping(value = "/addBuyerToContract", method = RequestMethod.POST)
+	public ResponseEntity<Object> addSellerToContract(@RequestBody buyerContractMapping buyerContractMapping) {
 		response res = new response();
 		try {
-			boolean added = donor_details_Int.addSellerToContract(sellerContractMapping);
+			boolean added = donor_details_Int.addBuyerToContract(buyerContractMapping);
 			if (!added) {
 				res.setMessage("No contaract  added");
 				return new ResponseEntity<Object>(res, HttpStatus.OK);
@@ -391,6 +407,8 @@ public class contraller {
 	public ResponseEntity<Object> getBuyerContactDetails(@PathVariable("address") String address) {
 		response res = new response();
 		try {
+			System.out.println("#################################################");
+			System.out.println(address);
 			List<propertyDetails> propertyDetails = donor_details_Int.getBuyerContactDetails(address);
 			if (propertyDetails.size() == 0) {
 				res.setMessage("No contaract  added");

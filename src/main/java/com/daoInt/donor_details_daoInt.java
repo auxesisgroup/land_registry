@@ -2,11 +2,10 @@ package com.daoInt;
 
 import java.util.List;
 
-
+import com.entity.buyerContractMapping;
 import com.entity.createkeypairs;
 import com.entity.propertyDetails;
 import com.entity.response;
-import com.entity.sellerContractMapping;
 import com.entity.sign_up;
 
 public interface donor_details_daoInt {
@@ -29,6 +28,6 @@ public interface donor_details_daoInt {
 	public int addBrokerContractMapping(propertyDetails propertyDetails) ;
 	public List<propertyDetails> getBrokerContactDetails(String address);
 	public List<sign_up> getSellerList();
-	public boolean addSellerToContract(sellerContractMapping sellerContractMapping);
+	public boolean addBuyerToContract(buyerContractMapping buyerContractMapping);
 	public List<propertyDetails> getBuyerContactDetails(String address) ;
 }

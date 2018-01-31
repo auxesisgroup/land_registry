@@ -45,4 +45,11 @@ public class propertyDetails {
 
 	@Column(name = "createdOn")
 	public Date createdOn;
+
+	@Column(name = "confirmPrice")
+	public BigInteger confirmPrice;
+
+	@Column(name = "confirmBuyer")
+	public String confirmBuyer;
+
 }

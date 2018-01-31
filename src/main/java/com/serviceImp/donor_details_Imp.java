@@ -12,7 +12,7 @@ import org.web3j.crypto.Hash;
 
 import com.blockchain.masterConstractImp;
 import com.daoInt.donor_details_daoInt;
-
+import com.entity.buyerContractMapping;
 import com.entity.createkeypairs;
 
 import com.entity.propertyDetails;
@@ -117,8 +117,8 @@ public class donor_details_Imp implements donor_details_Int {
 	}
 
 	@Override
-	public boolean addSellerToContract(sellerContractMapping sellerContractMapping) {
-		return _donor_details_daoInt.addSellerToContract(sellerContractMapping);
+	public boolean addBuyerToContract(buyerContractMapping buyerContractMapping){
+		return _donor_details_daoInt.addBuyerToContract(buyerContractMapping);
 	}
 
 	@Override

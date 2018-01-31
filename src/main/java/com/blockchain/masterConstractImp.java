@@ -31,6 +31,7 @@ import com.smartContract.PropertyDeal.PaymentEvnEventResponse;
 @Service
 public class masterConstractImp {
 
+	com.daoImp.donor_details_daoImp donor_details_daoImp = new com.daoImp.donor_details_daoImp();
 	landOwnershipContractImp landOwnershipContractImp = new landOwnershipContractImp();
 	static Web3j web3 = Web3j.build(new HttpService("http://139.59.213.205:7007"));
 	getBalance _getBalance = new getBalance();
@@ -85,13 +86,13 @@ public class masterConstractImp {
 			_propertyDetails.price = (transact.getValue3());
 			_propertyDetails.propertyAddress = (transact.getValue4());
 			_propertyDetails.status = (transact.getValue5());
-			res.setMethod("setSite");
+
 			res.setResult(_propertyDetails);
 			return res;
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception");
-			res.setMethod("setSite");
+
 			return res;
 		}
 	}
@@ -107,13 +108,13 @@ public class masterConstractImp {
 				return res;
 			}
 			TransactionReceipt transact = contract.addBroker(brokerAddress).sendAsync().get();
-			res.setMethod("setSite");
+
 			res.setResult(transact);
 			return res;
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception");
-			res.setMethod("setSite");
+
 			return res;
 		}
 	}
@@ -121,6 +122,8 @@ public class masterConstractImp {
 	public response SetBid(buyerDetails buyerDetails) {
 		response res = new response();
 		try {
+			System.out.println("contractAddress....................." + contractAddress);
+			System.out.println("price....................." + buyerDetails.price);
 			final String uuid = UUID.randomUUID().toString().replace("-", "");
 			byte[] bidId = new byte[32];
 			bidId = Numeric.hexStringToByteArray(typeCast.asciiToHex(uuid));
@@ -134,13 +137,13 @@ public class masterConstractImp {
 			TransactionReceipt transact = contract.bid(buyerDetails.address.toString(), buyerDetails.price, bidId)
 					.sendAsync().get();
 			List<BidEvnEventResponse> evnRes = contract.getBidEvnEvents(transact);
-			res.setMethod("setSite");
+
 			res.setResult(transact);
 			return res;
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception" + ex);
-			res.setMethod("setSite");
+
 			return res;
 		}
 	}
@@ -166,13 +169,13 @@ public class masterConstractImp {
 				buyerDetails.bidId = StringUtils.newStringUsAscii(transact.getValue3().get(i).getValue());
 				buyerDetailsList.add(buyerDetails);
 			}
-			res.setMethod("setSite");
+
 			res.setResult(buyerDetailsList);
 			return res;
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception" + ex);
-			res.setMethod("setSite");
+
 			return res;
 		}
 	}
@@ -190,15 +193,20 @@ public class masterConstractImp {
 			}
 			TransactionReceipt transact = contract.confirmBuyer(bidId).sendAsync().get();
 			List<ConfirmBuyerEvnEventResponse> evnRes = contract.getConfirmBuyerEvnEvents(transact);
-			res.setMethod("setSite");
 			res.setResult(transact);
+			propertyDetails propertyDetails = new propertyDetails();
+			propertyDetails.confirmBuyer = evnRes.get(0).from;
+			propertyDetails.confirmPrice = evnRes.get(0).value;
+			propertyDetails.contractAddress = contractAddress;
+			donor_details_daoImp.updateConfirmBuyer(propertyDetails);
+			// evnRes.get(0).from;
+			res.result = transact;
 			return res;
-
 		} catch (Exception ex) {
 			System.out.println("Ex::::::  " + ex);
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception");
-			res.setMethod("setSite");
+
 			return res;
 		}
 	}
@@ -218,13 +226,12 @@ public class masterConstractImp {
 			buyerDetails.address = transact.getValue1();
 			buyerDetails.price = transact.getValue2();
 			buyerDetails.bidId = new String(transact.getValue3());
-			res.setMethod("setSite");
 			res.setResult(buyerDetails);
 			return res;
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception");
-			res.setMethod("setSite");
+
 			return res;
 		}
 	}
@@ -243,13 +250,11 @@ public class masterConstractImp {
 			buyerDetails buyerDetails = new buyerDetails();
 			buyerDetails.address = transact.getValue1();
 			buyerDetails.price = transact.getValue2();
-			res.setMethod("setSite");
 			res.setResult(buyerDetails);
 			return res;
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception" + ex);
-			res.setMethod("setSite");
 			return res;
 		}
 	}
@@ -265,6 +270,8 @@ public class masterConstractImp {
 				res.setMessage("Invalid contract");
 				return res;
 			}
+
+			// price check
 			TransactionReceipt transact = contract.deposit(_value).sendAsync().get();
 
 			List<PaymentEvnEventResponse> evntRes = contract.getPaymentEvnEvents(transact);
@@ -285,7 +292,6 @@ public class masterConstractImp {
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception" + ex);
-			res.setMethod("setSite");
 			return res;
 		}
 	}
@@ -311,7 +317,7 @@ public class masterConstractImp {
 		} catch (Exception ex) {
 			// logger.error("Expection :" + ex);
 			res.setMessage("Exception" + ex);
-			res.setMethod("setSite");
+
 			return res;
 		}
 	}
@@ -333,14 +339,14 @@ public class masterConstractImp {
 	// buyerDetails buyerDetails = new buyerDetails();
 	// buyerDetails.address = transact.getValue1();
 	// buyerDetails.price = transact.getValue2();
-	// res.setMethod("setSite");
+	//
 	// res.setResult(buyerDetails);
 	// return res;
 	//
 	// } catch (Exception ex) {
 	// // logger.error("Expection :" + ex);
 	// res.setMessage("Exception" + ex);
-	// res.setMethod("setSite");
+	//
 	// return res;
 	// }
 	// }

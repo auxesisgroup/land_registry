@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -12,12 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import com.daoInt.donor_details_daoInt;
-
+import com.entity.buyerContractMapping;
 import com.entity.createkeypairs;
-
 import com.entity.propertyDetails;
 import com.entity.response;
-import com.entity.sellerContractMapping;
 import com.entity.sign_up;
 
 @Repository
@@ -139,8 +136,6 @@ public class donor_details_daoImp implements donor_details_daoInt, Serializable 
 		return p;
 	}
 
-	///////////////
-
 	public boolean addPropertyDetails(propertyDetails propertyDetails) {
 		try {
 			getSession().save(propertyDetails);
@@ -166,6 +161,25 @@ public class donor_details_daoImp implements donor_details_daoInt, Serializable 
 		return result;
 	}
 
+	public int updateConfirmBuyer(propertyDetails propertyDetails) {
+		int result = 0;
+		try {
+			System.out.println("propertyDetails.confirmPrice" + propertyDetails.confirmPrice);
+			System.out.println("propertyDetails.confirmBuyer" + propertyDetails.confirmBuyer);
+			System.out.println("propertyDetails.contractAddress" + propertyDetails.contractAddress);
+			Query query = getSession().createQuery(
+					"update propertyDetails set confirmBuyer=:confirmBuyer,confirmPrice=:confirmPrice where  contractAddress=:contractAddress");
+			query.setParameter("contractAddress", propertyDetails.contractAddress);
+			query.setParameter("confirmBuyer", propertyDetails.confirmBuyer);
+			query.setParameter("confirmPrice", propertyDetails.confirmPrice);
+			result = query.executeUpdate();
+			return result;
+		} catch (Exception ex) {
+			System.out.println("login ........." + ex);
+		}
+		return result;
+	}
+
 	public List<sign_up> getSellerList() {
 		List<sign_up> user = new ArrayList<sign_up>();
 		try {
@@ -180,10 +194,10 @@ public class donor_details_daoImp implements donor_details_daoInt, Serializable 
 		return user;
 	}
 
-	public boolean addSellerToContract(sellerContractMapping sellerContractMapping) {
+	public boolean addBuyerToContract(buyerContractMapping buyerContractMapping) {
 		try {
-			sellerContractMapping.Id = UUID.randomUUID().toString();
-			getSession().save(sellerContractMapping);
+			buyerContractMapping.Id = UUID.randomUUID().toString();
+			getSession().save(buyerContractMapping);
 			return true;
 		} catch (Exception ex) {
 			System.out.println("login ........." + ex);
@@ -195,14 +209,14 @@ public class donor_details_daoImp implements donor_details_daoInt, Serializable 
 		System.out.println("address...." + address);
 		List<propertyDetails> propertyDetails = new ArrayList<propertyDetails>();
 		try {
-			Query query = getSession().createQuery(
-					"FROM propertyDetails e INNER JOIN sellerContractMapping t ON e.contractAddress=t.contractAddress where  t.sellerAddress=:address");
+			Query query = getSession().createQuery("from propertyDetails e where e.contractAddress IN"
+					+ " (SELECT d.contractAddress   from buyerContractMapping d where d.sellerAddress=:address)");
 			query.setParameter("address", address);
 
-			System.out.println("################################################################....");
-			propertyDetails = query.list();
+			propertyDetails = query.getResultList();
+
 			System.out.println(
-					"################################################################...." + propertyDetails.size());
+					"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + propertyDetails.size());
 			return propertyDetails;
 		} catch (Exception ex) {
 			return propertyDetails;
